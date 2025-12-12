@@ -159,15 +159,45 @@ export default function HomeScreen({ navigation, route }) {  // useState used to
     setModalStep('choose');
   };
 
+  const autoSaveBoardForActivity = (nextActivity) => {
+    if (!nextActivity) return;
+
+    const titleToUse = boardTitle || getDefaultBoardTitle(targetDate, dayOffset);
+    const boardId = currentBoardId || uuid.v4();
+
+    const boardToSave = {
+      id: boardId,
+      type: dayOffset === 0 ? "today" : "day",
+      dateISO: targetDateISO,
+      baseDateISO,
+      dayOffset,
+      title: titleToUse,
+      cards: [nextActivity].filter(Boolean),
+    };
+
+    setHasChanges(true);
+
+    (async () => {
+      const result = currentBoardId ? await updateBoard(boardToSave) : await saveBoard(boardToSave);
+      const ok = Array.isArray(result) && result.length > 0;
+      if (!ok) return;
+
+      setCurrentBoardId(boardId);
+      setHasChanges(false);
+    })();
+  };
+
   function handleSetActivity(activity) {
     const currentSlot = typeof slotRef.current === 'string'
       ? slotRef.current
       : slotRef.current?.slot;
       
-    if (currentSlot === 'Activity') setActivity(activity);
-    else console.warn('Invalid slot. Could not assign activity.');
-
-    setHasChanges(true);
+    if (currentSlot === 'Activity') {
+      setActivity(activity);
+      autoSaveBoardForActivity(activity);
+    } else {
+      console.warn('Invalid slot. Could not assign activity.');
+    }
   };
 
   async function handleImagePick(type) {
@@ -190,14 +220,17 @@ export default function HomeScreen({ navigation, route }) {  // useState used to
       ? slotRef.current
       : slotRef.current?.slot;
 
-    if (currentSlot === 'Activity') setActivity(newCard);
-    else console.warn("Invalid slot. Could not assign activity.");
+    if (currentSlot === 'Activity') {
+      setActivity(newCard);
+      autoSaveBoardForActivity(newCard);
+    } else {
+      console.warn("Invalid slot. Could not assign activity.");
+    }
     
     // reset and close
     setIsNewCardVisible(false);
     setNewCardImage(null);
     setNewCardTitle('');
-    setHasChanges(true);
     slotRef.current = null;
   };
 
