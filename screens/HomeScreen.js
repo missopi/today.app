@@ -1,7 +1,7 @@
 // Main board screen containing the Now/Next/Then board
 
 import { useEffect, useRef, useState } from "react";  
-import { View, useWindowDimensions } from "react-native";
+import { Modal, Pressable, StyleSheet, Text, TextInput, View, useWindowDimensions } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import TodayBoard from "./components/TodayBoard";
 import getStyles from "./styles/HomeStyles";
@@ -88,6 +88,8 @@ export default function HomeScreen({ navigation, route }) {  // useState used to
 
   // saving boards
   const [currentBoardId, setCurrentBoardId] = useState(mode === 'load' ? board?.id || null : null);
+  const [isSaveModalVisible, setIsSaveModalVisible] = useState(false);
+  const [saveModalTitle, setSaveModalTitle] = useState("");
 
   // screen orientation
   const { width, height } = useWindowDimensions();
@@ -107,16 +109,28 @@ export default function HomeScreen({ navigation, route }) {  // useState used to
       const action = e.data.action;
       e.preventDefault();
       pendingActionRef.current = action;
+      setSaveModalTitle(boardTitle || "");
       setIsSaveModalVisible(true);
     });
 
     return unsub; // cleanup when unmounting
-  }, [navigation, hasChanges]);
+  }, [navigation, hasChanges, boardTitle]);
 
   const completeNavigation = async () => {
     const action = pendingActionRef.current;
     pendingActionRef.current = null;
     if (action) navigation.dispatch(action);
+  };
+
+  const discardAndNavigate = async () => {
+    setIsSaveModalVisible(false);
+    setHasChanges(false);
+    await completeNavigation();
+  };
+
+  const cancelNavigation = () => {
+    setIsSaveModalVisible(false);
+    pendingActionRef.current = null;
   };
 
   // loading saved boards
@@ -245,6 +259,42 @@ export default function HomeScreen({ navigation, route }) {  // useState used to
           date={targetDate}
         />
       </View>
+      <Modal
+        visible={isSaveModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={cancelNavigation}
+      >
+        <View style={saveModalStyles.backdrop}>
+          <View style={saveModalStyles.sheet}>
+            <Text style={saveModalStyles.title}>Save changes?</Text>
+            <Text style={saveModalStyles.subtitle}>
+              You have unsaved changes. Save before leaving?
+            </Text>
+            <TextInput
+              value={saveModalTitle}
+              onChangeText={setSaveModalTitle}
+              placeholder="Board title"
+              autoCapitalize="sentences"
+              style={saveModalStyles.input}
+            />
+            <View style={saveModalStyles.row}>
+              <Pressable onPress={cancelNavigation} style={[saveModalStyles.button, saveModalStyles.secondary]}>
+                <Text style={saveModalStyles.secondaryText}>Cancel</Text>
+              </Pressable>
+              <Pressable onPress={discardAndNavigate} style={[saveModalStyles.button, saveModalStyles.secondary, saveModalStyles.spaced]}>
+                <Text style={saveModalStyles.secondaryText}>Discard</Text>
+              </Pressable>
+              <Pressable
+                onPress={() => saveCurrentTodayBoard(saveModalTitle)}
+                style={[saveModalStyles.button, saveModalStyles.primary, saveModalStyles.spaced]}
+              >
+                <Text style={saveModalStyles.primaryText}>Save</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
       <ImageCardCreatorModal
         visible={isNewCardVisible}
         modalStep={modalStep}
@@ -267,3 +317,65 @@ export default function HomeScreen({ navigation, route }) {  // useState used to
     </SafeAreaView>
   );
 };
+
+const saveModalStyles = StyleSheet.create({
+  backdrop: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.45)",
+    padding: 20,
+    justifyContent: "center",
+  },
+  sheet: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 16,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 6,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: "#555",
+    marginBottom: 12,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 16,
+    marginBottom: 12,
+  },
+  row: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+  },
+  spaced: {
+    marginLeft: 10,
+  },
+  button: {
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 10,
+    borderWidth: 1,
+  },
+  primary: {
+    backgroundColor: "#111",
+    borderColor: "#111",
+  },
+  primaryText: {
+    color: "#fff",
+    fontWeight: "600",
+  },
+  secondary: {
+    backgroundColor: "#fff",
+    borderColor: "#ddd",
+  },
+  secondaryText: {
+    color: "#111",
+    fontWeight: "600",
+  },
+});
