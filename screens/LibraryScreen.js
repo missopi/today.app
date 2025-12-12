@@ -10,7 +10,6 @@ import Search from "../assets/icons/search.svg";
 import { allCategories } from '../data/Categories';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import useHandheldPortraitLock from "../utilities/useHandheldPortraitLock";
-import BackButton from "./components/BackButton";
 import ActivityCard from "./components/ActivityCard";
 import getCardBaseStyles from "./styles/CardBaseStyles";
 
@@ -139,7 +138,6 @@ const LibraryScreen = ({ navigation, route }) => {
       style={{ flex: 1, paddingTop, paddingBottom }}
       edges={['top', 'bottom', 'left', 'right']}
     >
-      <BackButton onPress={() => navigation.goBack()} />
       <View style={{ paddingHorizontal: horizontalPadding, paddingBottom: 8 }}>
         <View style={styles.searchContainer}>
           <Search width={20} height={20} style={styles.searchIcon} />

@@ -15,14 +15,14 @@ export default function getStyles(isPortrait, width, height) {
     container: {
       flex: 1,
       paddingHorizontal: 16,
-      paddingVertical: 12,
+      backgroundColor: '#fff',
     },
     wrapper: {
       flex: 1,
       alignItems: 'center',
-      justifyContent: 'center',
+      justifyContent: isPortrait ? 'flex-start' : 'center',
       flexDirection: isPortrait ? 'column' : 'row',
-      gap: isPortrait ? '0.5%' : '4%',
+      gap: isPortrait ? '3%' : '4%',
     },
     textTitle: {
       fontSize: titleSize,
@@ -43,15 +43,6 @@ export default function getStyles(isPortrait, width, height) {
     card: {
       ...baseStyles.card,
       width: '100%',
-    },
-    swapButton: {
-      alignSelf: "center",
-      padding: 8,
-    },
-    swapButtonInline: {
-      marginLeft: 10,
-      paddingHorizontal: 8,
-      paddingVertical: 6,
     },
     portraitNextHeader: {
       alignSelf: 'stretch',
