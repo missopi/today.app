@@ -11,6 +11,16 @@ export default function getStyles(isPortrait, width, height) {
 
   return StyleSheet.create({
     ...baseStyles,
+    dayOfWeekSvgWrapper: {
+      flex: 1,
+      width: "100%",
+      justifyContent: "center",
+      alignItems: "center",
+      marginBottom: shorter * 0.012,
+    },
+    dayOfWeekSvg: {
+      transform: [{ scale: 1.25 }],
+    },
     container: {
       flex: 1,
       paddingHorizontal: 16,

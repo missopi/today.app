@@ -27,15 +27,14 @@ export default function HomeScreen({ navigation, route }) {  // useState used to
   };
 
   // hydrate initial state immediately so the transition doesn't render an empty shell
-  const initialDayOfTheWeek = mode === 'load' && board?.cards?.[0]
-    ? { ...board.cards[0], image: resolveActivityImage(board.cards[0]) }
+  const initialActivityRaw = mode === 'load'
+    ? (board?.cards?.[1] ?? board?.cards?.[0] ?? null)
     : null;
-  const initialActivity = mode === 'load' && board?.cards?.[1]
-    ? { ...board.cards[1], image: resolveActivityImage(board.cards[1]) }
+  const initialActivity = initialActivityRaw
+    ? { ...initialActivityRaw, image: resolveActivityImage(initialActivityRaw) }
     : null;
 
   const [boardTitle, setBoardTitle] = useState(mode === 'load' ? (board?.title || '') : '');
-  const [dayOfTheWeek, setDayofTheWeek] = useState(initialDayOfTheWeek);
   const [activity, setActivity] = useState(initialActivity);
 
   // modal for adding custom card
@@ -111,8 +110,7 @@ export default function HomeScreen({ navigation, route }) {  // useState used to
       ? slotRef.current
       : slotRef.current?.slot;
       
-    if (currentSlot === 'Today') setDayofTheWeek(activity);
-    else if (currentSlot === 'Activity') setActivity(activity);
+    if (currentSlot === 'Activity') setActivity(activity);
     else console.warn('Invalid slot. Could not assign activity.');
 
     setHasChanges(true);
@@ -138,8 +136,7 @@ export default function HomeScreen({ navigation, route }) {  // useState used to
       ? slotRef.current
       : slotRef.current?.slot;
 
-    if (currentSlot === 'Today') setDayofTheWeek(newCard);
-    else if (currentSlot === 'Activity') setActivity(newCard);
+    if (currentSlot === 'Activity') setActivity(newCard);
     else console.warn("Invalid slot. Could not assign activity.");
     
     // reset and close
@@ -153,7 +150,7 @@ export default function HomeScreen({ navigation, route }) {  // useState used to
   const saveCurrentTodayBoard = async (titleFromModal) => {
     const titleToUse = titleFromModal || boardTitle;
 
-    if (![dayOfTheWeek, activity].filter(Boolean).length) {
+    if (!activity) {
       alert("Please add image before saving.");
       return;
     }
@@ -162,7 +159,7 @@ export default function HomeScreen({ navigation, route }) {  // useState used to
       id: currentBoardId || uuid.v4(),
       type: 'today',
       title: titleToUse || "Today",
-      cards: [dayOfTheWeek, activity].filter(Boolean),
+      cards: [activity].filter(Boolean),
     };
 
     if (currentBoardId) {
@@ -179,17 +176,12 @@ export default function HomeScreen({ navigation, route }) {  // useState used to
   };
 
   const loadTodayBoard = (board) => {
-    const today = board.cards[0] ? { 
-      ...board.cards[0], 
-      image: resolveActivityImage(board.cards[0]) 
+    const activityRaw = board?.cards?.[1] ?? board?.cards?.[0] ?? null;
+    const activity = activityRaw ? {
+      ...activityRaw,
+      image: resolveActivityImage(activityRaw),
     } : null;
 
-    const activity = board.cards[1] ? { 
-      ...board.cards[1], 
-      image: resolveActivityImage(board.cards[1]) 
-    } : null;
-
-    setDayofTheWeek(today);
     setActivity(activity);
     setCurrentBoardId(board.id);
     setBoardTitle(board.title || '');
@@ -203,7 +195,6 @@ export default function HomeScreen({ navigation, route }) {  // useState used to
     >
       <View style={{ flex: 1 }}>
         <TodayBoard 
-          dayOfTheWeek={dayOfTheWeek}
           activity={activity} 
           onSelectSlot={onSelectSlot}
           readOnly={false} 

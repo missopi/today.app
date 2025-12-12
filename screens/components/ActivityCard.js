@@ -16,6 +16,8 @@ const ActivityCard = ({
   resolveActivityImage,
   cornerContent = null,
   shrinkBitmapImage = false,
+  svgStyle,
+  svgWrapperStyle,
 }) => {
   const resolvedImage = resolveActivityImage
     ? resolveActivityImage(activity)
@@ -29,7 +31,13 @@ const ActivityCard = ({
   const imageContent = !imageSource
     ? null
     : isSvg ? (
-        <ImageComponent width="100%" height="100%"/>
+        svgWrapperStyle ? (
+          <View style={svgWrapperStyle}>
+            <ImageComponent width="100%" height="100%" style={svgStyle} />
+          </View>
+        ) : (
+          <ImageComponent width="100%" height="100%" style={svgStyle} />
+        )
       ) : (
         <Image
           source={imageSource}
