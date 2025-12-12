@@ -96,7 +96,7 @@ export default function App() {
               name="LibraryScreen" 
               component={LibraryScreen}
               options={{
-                headerShown: true,
+                headerShown: false,
               }}
             />
           </Stack.Navigator>
