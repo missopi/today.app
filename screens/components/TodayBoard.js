@@ -14,7 +14,7 @@ import Sunday from "../../assets/days-of-the-week/sunday.svg";
 
 const DAY_SVGS = [Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday];
 
-const TodayBoard = ({ activity, onSelectSlot, readOnly, styles }) => {
+const TodayBoard = ({ activity, onSelectSlot, readOnly, styles, date = new Date() }) => {
   const resolveActivityImage = (activity) => {
     if (!activity) return null;
     if (activity.fromLibrary && activity.imageKey) {
@@ -24,8 +24,9 @@ const TodayBoard = ({ activity, onSelectSlot, readOnly, styles }) => {
     return activity.image || null;
   };
 
-  const todayIndex = new Date(Date.now()).getDay();
-  const TodaySvg = DAY_SVGS[todayIndex] ?? Sunday;
+  const resolvedDate = date instanceof Date ? date : new Date(date);
+  const dayIndex = resolvedDate.getDay();
+  const TodaySvg = DAY_SVGS[dayIndex] ?? Sunday;
   const dayOfTheWeek = { image: TodaySvg };
 
   return (

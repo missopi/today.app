@@ -13,9 +13,47 @@ import { saveBoard, updateBoard } from "../utilities/BoardStore";
 import { activityLibrary } from "../data/ActivityLibrary";
 import useHandheldPortraitLock from "../utilities/useHandheldPortraitLock";
 
+const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+const getLocalISODate = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+const parseLocalISODate = (iso) => {
+  if (typeof iso !== "string") return null;
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+  if (!match) return null;
+  const year = Number(match[1]);
+  const monthIndex = Number(match[2]) - 1;
+  const day = Number(match[3]);
+  const date = new Date(year, monthIndex, day);
+  date.setHours(12, 0, 0, 0);
+  return date;
+};
+
+const addDaysLocalNoDSTSurprises = (date, days) => {
+  const copy = new Date(date);
+  copy.setHours(12, 0, 0, 0);
+  copy.setDate(copy.getDate() + days);
+  return copy;
+};
+
+const getDefaultBoardTitle = (date, dayOffset) => {
+  if (dayOffset === 0) return "Today";
+  return DAY_NAMES[date.getDay()] || "Day";
+};
+
 export default function HomeScreen({ navigation, route }) {  // useState used to track selected activities
   const { mode, board } = route.params || {};
   const [hasChanges, setHasChanges] = useState(false);
+  const dayOffset = Number(route?.params?.dayOffset ?? 0);
+  const baseDateISO = route?.params?.baseDateISO ?? getLocalISODate(new Date());
+  const parsedBase = parseLocalISODate(baseDateISO) ?? new Date();
+  const targetDate = addDaysLocalNoDSTSurprises(parsedBase, dayOffset);
+  const targetDateISO = getLocalISODate(targetDate);
 
   function resolveActivityImage(activity) {
     if (!activity) return null;
@@ -34,7 +72,9 @@ export default function HomeScreen({ navigation, route }) {  // useState used to
     ? { ...initialActivityRaw, image: resolveActivityImage(initialActivityRaw) }
     : null;
 
-  const [boardTitle, setBoardTitle] = useState(mode === 'load' ? (board?.title || '') : '');
+  const [boardTitle, setBoardTitle] = useState(
+    mode === "load" ? (board?.title || "") : getDefaultBoardTitle(targetDate, dayOffset)
+  );
   const [activity, setActivity] = useState(initialActivity);
 
   // modal for adding custom card
@@ -157,8 +197,11 @@ export default function HomeScreen({ navigation, route }) {  // useState used to
 
     const board = {
       id: currentBoardId || uuid.v4(),
-      type: 'today',
-      title: titleToUse || "Today",
+      type: dayOffset === 0 ? "today" : "day",
+      dateISO: targetDateISO,
+      baseDateISO,
+      dayOffset,
+      title: titleToUse || getDefaultBoardTitle(targetDate, dayOffset),
       cards: [activity].filter(Boolean),
     };
 
@@ -199,6 +242,7 @@ export default function HomeScreen({ navigation, route }) {  // useState used to
           onSelectSlot={onSelectSlot}
           readOnly={false} 
           styles={styles}
+          date={targetDate}
         />
       </View>
       <ImageCardCreatorModal
