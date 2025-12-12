@@ -16,9 +16,11 @@ import HomeScreenDay3 from "./screens/HomeScreenDay3";
 import HomeScreenDay4 from "./screens/HomeScreenDay4";
 import HomeScreenDay5 from "./screens/HomeScreenDay5";
 import HomeScreenDay6 from "./screens/HomeScreenDay6";
+import WeekOverviewScreen from "./screens/WeekOverviewScreen";
 
 import Word from "./assets/andNext-today-words-cropped.svg";
 import BackIcon from "./assets/icons/back_button.svg";
+import CalendarIcon from "./assets/icons/calendar.svg";
 
 const Stack = createStackNavigator();
 
@@ -109,29 +111,47 @@ export default function App() {
                 );
               },
               headerRight: () => {
-                const nextRoute = nextRouteByName[route.name];
-                if (!nextRoute) return null;
+                if (route.name === "WeekOverview") return null;
 
+                const nextRoute = nextRouteByName[route.name];
                 const baseDateISO = route.params?.baseDateISO ?? getLocalISODate(new Date());
 
                 return (
-                  <Pressable
-                    accessibilityRole="button"
-                    accessibilityLabel="Next day"
-                    onPress={() => navigation.navigate(nextRoute, { baseDateISO })}
-                    hitSlop={10}
-                    style={({ pressed }) => ({
-                      opacity: pressed ? 0.6 : 1,
-                      paddingHorizontal: pageIconPaddingX,
-                      paddingVertical: pageIconPaddingY,
-                    })}
-                  >
-                    <BackIcon
-                      width={navIconSize}
-                      height={navIconSize}
-                      style={{ transform: [{ scaleX: -1 }] }}
-                    />
-                  </Pressable>
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <Pressable
+                      accessibilityRole="button"
+                      accessibilityLabel="Open calendar"
+                      onPress={() => navigation.navigate("WeekOverview", { baseDateISO })}
+                      hitSlop={10}
+                      style={({ pressed }) => ({
+                        opacity: pressed ? 0.6 : 1,
+                        paddingHorizontal: pageIconPaddingX,
+                        paddingVertical: pageIconPaddingY,
+                      })}
+                    >
+                      <CalendarIcon width={navIconSize} height={navIconSize} />
+                    </Pressable>
+
+                    {nextRoute ? (
+                      <Pressable
+                        accessibilityRole="button"
+                        accessibilityLabel="Next day"
+                        onPress={() => navigation.navigate(nextRoute, { baseDateISO })}
+                        hitSlop={10}
+                        style={({ pressed }) => ({
+                          opacity: pressed ? 0.6 : 1,
+                          paddingHorizontal: pageIconPaddingX,
+                          paddingVertical: pageIconPaddingY,
+                        })}
+                      >
+                        <BackIcon
+                          width={navIconSize}
+                          height={navIconSize}
+                          style={{ transform: [{ scaleX: -1 }] }}
+                        />
+                      </Pressable>
+                    ) : null}
+                  </View>
                 );
               },
             })}
@@ -149,6 +169,7 @@ export default function App() {
             <Stack.Screen name="HomeDay4" component={HomeScreenDay4} />
             <Stack.Screen name="HomeDay5" component={HomeScreenDay5} />
             <Stack.Screen name="HomeDay6" component={HomeScreenDay6} />
+            <Stack.Screen name="WeekOverview" component={WeekOverviewScreen} />
             <Stack.Screen 
               name="LibraryScreen" 
               component={LibraryScreen}
