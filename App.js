@@ -38,8 +38,8 @@ export default function App() {
   }, [shorter]);
 
   const scale = Math.min(Math.max(shorter / 430, 1), 1.6);
-  const iconSize = 45 * scale;
-  const headerSpace = 10 * scale;
+  const iconSize = 50 * scale;
+  const headerSpace = 15 * scale;
   const wordWidth = 150 * scale; 
 
   return (

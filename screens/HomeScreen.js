@@ -198,8 +198,8 @@ export default function HomeScreen({ navigation, route }) {  // useState used to
 
   return (
     <SafeAreaView
-      style={{ backgroundColor: '#fff', flex: 1, paddingTop: Math.max(0 - insets.top, 0), paddingBottom: Math.max(0 - insets.bottom, 0) }}
-      edges={['top', 'bottom', 'left', 'right']}
+      style={{ backgroundColor: '#fff', flex: 1 }}
+      edges={['bottom', 'left', 'right']}
     >
       <View style={{ flex: 1 }}>
         <TodayBoard 

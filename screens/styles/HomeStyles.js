@@ -8,13 +8,13 @@ export default function getStyles(isPortrait, width, height) {
   const columnWidth = isPortrait
     ? baseColumn
     : Math.min(width * 0.42, metrics.cardWidth);
-  const titleSize = Math.min(Math.max(shorter * 0.05, 20), 40);
 
   return StyleSheet.create({
     ...baseStyles,
     container: {
       flex: 1,
       paddingHorizontal: 16,
+      paddingVertical: 5,
       backgroundColor: '#fff',
     },
     wrapper: {
@@ -22,17 +22,7 @@ export default function getStyles(isPortrait, width, height) {
       alignItems: 'center',
       justifyContent: isPortrait ? 'flex-start' : 'center',
       flexDirection: isPortrait ? 'column' : 'row',
-      gap: isPortrait ? '3%' : '4%',
-    },
-    textTitle: {
-      fontSize: titleSize,
-      fontWeight: 'bold',
-    },
-    iconRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 6,
-      paddingBottom: 8,
+      gap: '4%',
     },
     column: {
       flexDirection: 'column',
@@ -43,18 +33,6 @@ export default function getStyles(isPortrait, width, height) {
     card: {
       ...baseStyles.card,
       width: '100%',
-    },
-    portraitNextHeader: {
-      alignSelf: 'stretch',
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      paddingBottom: 6,
-    },
-    centerGroup: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 5,
     },
   });
 };
