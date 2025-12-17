@@ -149,10 +149,25 @@ export default function WeekOverviewScreen({ navigation, route }) {
     },
   };
 
+  const cardAspectRatio = sharedCardStyle.aspectRatio ?? 1.05;
+  const dayCardHeightLandscape = cardWidth / cardAspectRatio;
+  const daySvgScale = isLandscape ? 1.2 : 1.5;
+  const daySvgWrapperStyle = {
+    flex: 1,
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: Math.min(width, height) * 0.01,
+  };
+  const daySvgStyle = {
+    transform: [{ scale: daySvgScale }],
+  };
+
   const dayCardStyles = {
     ...baseStyles,
     card: {
       ...sharedCardStyle,
+      ...(isLandscape ? { padding: cardPadding, height: dayCardHeightLandscape } : {}),
     },
   };
 
@@ -182,24 +197,17 @@ export default function WeekOverviewScreen({ navigation, route }) {
     const onPress = () => navigation.navigate(buildRouteForOffset(item.dayOffset), { baseDateISO });
 
     if (item.kind === "day") {
+      const Svg = item.DaySvg;
+      const DaySvg = (props) => <Svg {...props} />;
       return (
         <ActivityCard
-          activity={{ image: item.DaySvg }}
+          activity={{ image: DaySvg }}
           label=""
           onPress={onPress}
           styles={dayCardStyles}
-          resolveActivityImage={(a) => a?.image || null}
           stroke={DAY_CARD_STROKE}
-          svgWrapperStyle={{
-            flex: 1,
-            width: "100%",
-            justifyContent: "center",
-            alignItems: "center",
-            marginBottom: Math.min(width, height) * 0.01,
-          }}
-          svgStyle={{
-            transform: [{ scale: 1.5 }],
-          }}
+          svgWrapperStyle={daySvgWrapperStyle}
+          svgStyle={daySvgStyle}
         />
       );
     }
