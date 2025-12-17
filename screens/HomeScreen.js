@@ -1,15 +1,16 @@
 // Main board screen containing the Now/Next/Then board
 
-import { useEffect, useRef, useState } from "react";  
+import { useCallback, useEffect, useRef, useState } from "react";  
 import { Modal, Pressable, StyleSheet, Text, TextInput, View, useWindowDimensions } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { useFocusEffect } from "@react-navigation/native";
 import TodayBoard from "./components/TodayBoard";
 import getStyles from "./styles/HomeStyles";
 import { setActivityCallback } from "./components/CallbackStore";
 import { pickImage } from "../utilities/imagePickerHelper";
 import ImageCardCreatorModal from "./modals/ImageCardCreatorModal";
 import uuid from "react-native-uuid";
-import { saveBoard, updateBoard } from "../utilities/BoardStore";
+import { getBoards, saveBoard, updateBoard } from "../utilities/BoardStore";
 import { activityLibrary } from "../data/ActivityLibrary";
 import useHandheldPortraitLock from "../utilities/useHandheldPortraitLock";
 
@@ -102,6 +103,21 @@ export default function HomeScreen({ navigation, route }) {  // useState used to
   // Intercept navigation to show Save modal if unsaved changes exist
   const pendingActionRef = useRef(null);
 
+  function loadTodayBoard(board) {
+    const activityRaw = board?.cards?.[1] ?? board?.cards?.[0] ?? null;
+    const activity = activityRaw
+      ? {
+          ...activityRaw,
+          image: resolveActivityImage(activityRaw),
+        }
+      : null;
+
+    setActivity(activity);
+    setCurrentBoardId(board?.id ?? null);
+    setBoardTitle(board?.title || "");
+    setHasChanges(false);
+  }
+
   useEffect(() => {
     const unsub = navigation.addListener('beforeRemove', (e) => {
       if (!hasChanges) return;
@@ -139,6 +155,35 @@ export default function HomeScreen({ navigation, route }) {  // useState used to
       loadTodayBoard(board);
     }
   }, [mode, board, currentBoardId]);
+
+  // rehydrate from AsyncStorage when arriving from WeekOverview (or returning to the app)
+  useFocusEffect(
+    useCallback(() => {
+      let cancelled = false;
+
+      (async () => {
+        if (hasChanges) return;
+        if (mode === "load" && board) return;
+
+        const boards = await getBoards();
+        if (cancelled) return;
+
+        const matchingBoards = boards.filter(
+          (b) => b?.baseDateISO === baseDateISO && Number(b?.dayOffset) === dayOffset
+        );
+        const latest = matchingBoards.length ? matchingBoards[matchingBoards.length - 1] : null;
+
+        if (!latest) return;
+        if (latest?.id && latest.id === currentBoardId) return;
+
+        loadTodayBoard(latest);
+      })();
+
+      return () => {
+        cancelled = true;
+      };
+    }, [hasChanges, mode, board, baseDateISO, dayOffset, currentBoardId])
+  );
 
   const slotRef = useRef(null);
 
@@ -263,19 +308,6 @@ export default function HomeScreen({ navigation, route }) {  // useState used to
     setIsSaveModalVisible(false);
     setHasChanges(false);
     if (pendingActionRef.current) completeNavigation(); 
-  };
-
-  const loadTodayBoard = (board) => {
-    const activityRaw = board?.cards?.[1] ?? board?.cards?.[0] ?? null;
-    const activity = activityRaw ? {
-      ...activityRaw,
-      image: resolveActivityImage(activityRaw),
-    } : null;
-
-    setActivity(activity);
-    setCurrentBoardId(board.id);
-    setBoardTitle(board.title || '');
-    setHasChanges(false);
   };
 
   return (
