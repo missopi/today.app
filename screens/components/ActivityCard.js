@@ -29,6 +29,21 @@ const ActivityCard = ({
   const ImageComponent = isSvg ? imageSource : null;
   const isLibraryCard = activity?.fromLibrary;
 
+  let strokeStyle = null;
+  if (stroke) {
+    const strokeWidth = stroke.width ?? 15;
+    // Treat `stroke.borderRadius` as the desired *inner* corner radius.
+    // The outer corner radius must include the stroke width, otherwise
+    // the inner corners look square when the stroke is thick.
+    const innerRadius = stroke.borderRadius ?? styles.card?.borderRadius ?? 20;
+
+    strokeStyle = {
+      borderColor: stroke.color ?? "#3fb9ffff",
+      borderWidth: strokeWidth,
+      borderRadius: innerRadius + strokeWidth,
+    };
+  }
+
   const imageContent = !imageSource
     ? null
     : isSvg ? (
@@ -57,13 +72,7 @@ const ActivityCard = ({
       onPress={readOnly ? undefined : onPress}
       style={[
         styles.card,
-        stroke
-          ? {
-              borderColor: stroke.color ?? "#3fb9ffff",
-              borderWidth: stroke.width ?? 15,
-              borderRadius: stroke.borderRadius ?? styles.card?.borderRadius ?? 20,
-            }
-          : null,
+        strokeStyle,
         isLibraryCard && styles.libraryCard,
       ]}
     >
