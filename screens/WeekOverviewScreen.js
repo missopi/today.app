@@ -106,15 +106,53 @@ export default function WeekOverviewScreen({ navigation, route }) {
   const containerWidth = Math.max(width - (EDGE + Math.max(insets.left, insets.right)) * 2, 240);
   const availableWidth = Math.max(containerWidth - (GAP * (numColumns - 1)), 240);
   const cardWidth = Math.min(metrics.cardWidth, availableWidth / numColumns);
-  const cardStyles = {
+  const cardScale = metrics.cardWidth ? cardWidth / metrics.cardWidth : 1;
+  const fontBoost = 1.15;
+  const scaledTitleSize = Math.max(10, metrics.textLarge * cardScale * fontBoost);
+  const scaledBodySize = Math.max(9, metrics.textBody * cardScale * fontBoost);
+  const cardPadding = Math.max(8, cardWidth * 0.05);
+  const imageTextGap = 2;
+  const sharedCardStyle = {
+    ...baseStyles.card,
+    width: cardWidth,
+    marginHorizontal: 0,
+    shadowOpacity: 0.35,
+    shadowRadius: 3,
+    elevation: 3,
+  };
+
+  const activityCardStyles = {
     ...baseStyles,
     card: {
-      ...baseStyles.card,
-      width: cardWidth,
-      marginHorizontal: 0,
-      shadowOpacity: 0.35,
-      shadowRadius: 3,
-      elevation: 3,
+      ...sharedCardStyle,
+      padding: cardPadding,
+    },
+    title: {
+      ...baseStyles.title,
+      fontSize: scaledTitleSize,
+    },
+    placeholderText: {
+      ...baseStyles.placeholderText,
+      fontSize: scaledBodySize,
+    },
+    image: {
+      ...baseStyles.image,
+      marginBottom: baseStyles.image?.marginBottom
+        ? baseStyles.image.marginBottom * cardScale + imageTextGap
+        : imageTextGap,
+    },
+    placeholder: {
+      ...baseStyles.placeholder,
+      marginBottom: baseStyles.placeholder?.marginBottom
+        ? baseStyles.placeholder.marginBottom * cardScale + imageTextGap
+        : imageTextGap,
+    },
+  };
+
+  const dayCardStyles = {
+    ...baseStyles,
+    card: {
+      ...sharedCardStyle,
     },
   };
 
@@ -149,7 +187,7 @@ export default function WeekOverviewScreen({ navigation, route }) {
           activity={{ image: item.DaySvg }}
           label=""
           onPress={onPress}
-          styles={cardStyles}
+          styles={dayCardStyles}
           resolveActivityImage={(a) => a?.image || null}
           stroke={DAY_CARD_STROKE}
           svgWrapperStyle={{
@@ -171,7 +209,7 @@ export default function WeekOverviewScreen({ navigation, route }) {
         activity={item.activity}
         label="Add Activity"
         onPress={onPress}
-        styles={cardStyles}
+        styles={activityCardStyles}
         resolveActivityImage={resolveActivityImage}
         stroke={ACTIVITY_CARD_STROKE}
       />
