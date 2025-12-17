@@ -30,11 +30,9 @@ const ActivityCard = ({
   const isLibraryCard = activity?.fromLibrary;
 
   let strokeStyle = null;
-  if (stroke) {
+  const shouldRenderStroke = Boolean(stroke) && Boolean(imageSource);
+  if (shouldRenderStroke) {
     const strokeWidth = stroke.width ?? 15;
-    // Treat `stroke.borderRadius` as the desired *inner* corner radius.
-    // The outer corner radius must include the stroke width, otherwise
-    // the inner corners look square when the stroke is thick.
     const innerRadius = stroke.borderRadius ?? styles.card?.borderRadius ?? 20;
 
     strokeStyle = {
