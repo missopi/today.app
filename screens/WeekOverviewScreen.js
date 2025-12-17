@@ -45,6 +45,7 @@ const addDaysLocalNoDSTSurprises = (date, days) => {
 };
 
 const buildRouteForOffset = (dayOffset) => (dayOffset === 0 ? "Home" : `HomeDay${dayOffset}`);
+const DAY_CARD_STROKE = { color: "#3fb9ffff", width: 10, borderRadius: 20 };
 
 export default function WeekOverviewScreen({ navigation, route }) {
   const { width, height } = useWindowDimensions();
@@ -110,6 +111,9 @@ export default function WeekOverviewScreen({ navigation, route }) {
       ...baseStyles.card,
       width: cardWidth,
       marginHorizontal: 0,
+      shadowOpacity: 0.35,
+      shadowRadius: 3,
+      elevation: 3,
     },
   };
 
@@ -147,6 +151,7 @@ export default function WeekOverviewScreen({ navigation, route }) {
           onPress={onPress}
           styles={cardStyles}
           resolveActivityImage={(a) => a?.image || null}
+          stroke={DAY_CARD_STROKE}
           svgWrapperStyle={{
             flex: 1,
             width: "100%",

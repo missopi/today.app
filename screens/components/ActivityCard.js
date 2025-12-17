@@ -18,6 +18,7 @@ const ActivityCard = ({
   shrinkBitmapImage = false,
   svgStyle,
   svgWrapperStyle,
+  stroke,
 }) => {
   const resolvedImage = resolveActivityImage
     ? resolveActivityImage(activity)
@@ -54,7 +55,17 @@ const ActivityCard = ({
     <TouchableOpacity
       disabled={readOnly}
       onPress={readOnly ? undefined : onPress}
-      style={[styles.card, isLibraryCard && styles.libraryCard]}
+      style={[
+        styles.card,
+        stroke
+          ? {
+              borderColor: stroke.color ?? "#3fb9ffff",
+              borderWidth: stroke.width ?? 15,
+              borderRadius: stroke.borderRadius ?? styles.card?.borderRadius ?? 20,
+            }
+          : null,
+        isLibraryCard && styles.libraryCard,
+      ]}
     >
       {cornerContent ? (
         <View style={styles.cornerRow}>{cornerContent}</View>

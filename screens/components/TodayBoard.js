@@ -13,6 +13,7 @@ import Saturday from "../../assets/days-of-the-week/saturday.svg";
 import Sunday from "../../assets/days-of-the-week/sunday.svg";
 
 const DAY_SVGS = [Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday];
+const DAY_CARD_STROKE = { color: "#3fb9ffff", width: 20, borderRadius: 20 };
 
 const TodayBoard = ({ activity, onSelectSlot, readOnly, styles, date = new Date() }) => {
   const resolveActivityImage = (activity) => {
@@ -42,6 +43,7 @@ const TodayBoard = ({ activity, onSelectSlot, readOnly, styles, date = new Date(
             resolveActivityImage={resolveActivityImage}
             svgWrapperStyle={styles.dayOfWeekSvgWrapper}
             svgStyle={styles.dayOfWeekSvg}
+            stroke={DAY_CARD_STROKE}
           />
         </View>
         <View style={styles.column}>
