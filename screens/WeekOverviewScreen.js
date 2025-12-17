@@ -133,7 +133,6 @@ export default function WeekOverviewScreen({ navigation, route }) {
   }, [isLandscape, week]);
 
   const contentContainerStyle = {
-    paddingTop: Math.max(insets.top, EDGE),
     paddingBottom: Math.max(insets.bottom, EDGE),
     paddingHorizontal: EDGE + Math.max(insets.left, insets.right),
     gap: GAP,
@@ -158,7 +157,7 @@ export default function WeekOverviewScreen({ navigation, route }) {
             width: "100%",
             justifyContent: "center",
             alignItems: "center",
-            marginBottom: Math.min(width, height) * 0.012,
+            marginBottom: Math.min(width, height) * 0.01,
           }}
           svgStyle={{
             transform: [{ scale: 1.5 }],
