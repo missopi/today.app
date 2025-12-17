@@ -13,8 +13,8 @@ import Saturday from "../../assets/days-of-the-week/saturday.svg";
 import Sunday from "../../assets/days-of-the-week/sunday.svg";
 
 const DAY_SVGS = [Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday];
-const DAY_CARD_STROKE = { color: "#3fb9ffff", width: 10, borderRadius: 20 };
-const SVG_CARD_STROKE = { color: "#ffb53dff", width: 10, borderRadius: 20 };
+const DAY_CARD_STROKE = { color: "#3fb9ffff", width: 5, borderRadius: 20 };
+const SVG_CARD_STROKE = { color: "#ffb53dff", width: 5, borderRadius: 20 };
 
 const TodayBoard = ({ activity, onSelectSlot, readOnly, styles, date = new Date() }) => {
   const resolveActivityImage = (activity) => {

@@ -1,4 +1,5 @@
 import { View, Text, TouchableOpacity, Image } from "react-native";
+import { getActivityCardBorderColor } from "../../data/Categories";
 
 const getImageSource = (image) => {
   if (!image) return null;
@@ -29,6 +30,8 @@ const ActivityCard = ({
   const ImageComponent = isSvg ? imageSource : null;
   const isLibraryCard = activity?.fromLibrary;
 
+  const activityBorderColor = getActivityCardBorderColor(activity, imageSource);
+
   let strokeStyle = null;
   const shouldRenderStroke = Boolean(stroke) && Boolean(imageSource);
   if (shouldRenderStroke) {
@@ -36,11 +39,19 @@ const ActivityCard = ({
     const innerRadius = stroke.borderRadius ?? styles.card?.borderRadius ?? 20;
 
     strokeStyle = {
-      borderColor: stroke.color ?? "#3fb9ffff",
+      borderColor: activityBorderColor ?? stroke.color ?? "#3fb9ffff",
       borderWidth: strokeWidth,
       borderRadius: innerRadius + strokeWidth,
     };
   }
+
+  const cardBorderStyle =
+    !shouldRenderStroke && activityBorderColor
+      ? {
+          borderColor: activityBorderColor,
+          borderWidth: Math.max(styles.card?.borderWidth ?? 1, 4),
+        }
+      : null;
 
   const imageContent = !imageSource
     ? null
@@ -70,6 +81,7 @@ const ActivityCard = ({
       onPress={readOnly ? undefined : onPress}
       style={[
         styles.card,
+        cardBorderStyle,
         strokeStyle,
         isLibraryCard && styles.libraryCard,
       ]}
